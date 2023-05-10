@@ -1,0 +1,43 @@
+sketch.js
+game = Game(size=...)
+
+loop() -> 
+
+
+class Game
+    state = welcome, playing, gameover
+    isRealPlayer = true
+    speed = 2 # blocks/sec falling rate
+    score = 0
+    Game(size)
+    step(dir='D', 'L', 'R', or None)
+    reset()
+    render()
+
+class Board
+    currentPiece: None or Piece
+    board = [[0, 0, 1...]] # top 2 rows are rendered off screen
+    
+    moveDown() # moves currentPiece down 1 block
+    dropDown() # moves currentPiece down all the way
+
+    checkCompleteAndShift() # checks for complete rows and shifts board
+
+class Block
+    # single block
+    Pos = x, y
+
+    getPos() -> get current position of block
+    getFuturePos() -> get pos if it was to be moved down by one
+    moveDown() -> move block down by one
+    render() -> render one block
+
+class Piece
+    # multiple blocks
+    blocks: [Block]
+
+    getBlocks() -> [Block] get current blocks
+    moveBlocks() -> [Block] moved down by one
+    rotateBlocks() -> [Block] rotated once
+
+    render() -> render each block

@@ -1,29 +1,29 @@
-// class COLORS {
-//   static red = color("#E91F1F");
-//   static blue = color("#2C63F5");
-//   static green = color("#448F68");
-//   static yellow = color("#FDFD4D");
-//   static purple = color("#981FB7");
-//   static lightblue = color("#54E9DD");
-//   static orange = color("#EA9503");
-//   static allColors = [
-//     this.red,
-//     this.blue,
-//     this.green,
-//     this.yellow,
-//     this.purple,
-//     this.lightblue,
-//     this.orange,
-//   ];
-// }
+new p5();
 
-class ACTIONS {
-  static none = "none";
-  static left = "left";
-  static right = "right";
-  static down = "down";
-  static rotate = "rotate";
+const UI = {
+  width: 500,
+  height: 1000,
 }
+
+const COLORS = {
+  red: color("#E91F1F"),
+  blue: color("#2C63F5"),
+  green: color("#448F68"),
+  yellow: color("#FDFD4D"),
+  purple: color("#981FB7"),
+  lightblue: color("#54E9DD"),
+  orange: color("#EA9503"),
+};
+
+const ALL_COLORS = Object.values(COLORS);
+
+const ACTIONS = {
+  NONE: "none",
+  LEFT: "left",
+  RIGHT: "right",
+  DOWN: "down",
+  ROTATE: "rotate",
+};
 
 /**
  *
