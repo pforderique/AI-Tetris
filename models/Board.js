@@ -17,7 +17,7 @@ class Board {
   }
 
   generatePiece() {
-    const pieceClass = randChoose([Square, Line, T, LeftL, RightL]);
+    const pieceClass = randChoose([Square, Line, T, LeftL, RightL, LeftZ, RightZ]);
     const color = randChoose(ALL_COLORS);
     const x = Math.floor(Math.random() * this.width);
     const y = -2;
