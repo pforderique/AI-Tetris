@@ -8,7 +8,7 @@ class Game {
   constructor() {
     this.board = new Board();
 
-    this.speed = 15; // blocks per second
+    this.speed = 10; // blocks per second
     this.cycle = millis();
     this.move = ACTIONS.NONE;
   }
@@ -24,8 +24,8 @@ class Game {
    * 
    * @param {ACTIONS} move the move to make 
    */
-  step() {
-    if (millis() - this.cycle < 1000 / this.speed) return;
+  step(fastForward = false) {
+    if (!fastForward && millis() - this.cycle < 1000 / this.speed) return;
 
     this.board.step(this.move);
     this.move = ACTIONS.NONE; // reset move for next step
