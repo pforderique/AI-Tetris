@@ -1,82 +1,60 @@
-const TYPES = {
-  O: 0, // empty
-  B: 1, // block
-  C: 2, // current block
-};
-
 class Board {
-  constructor(w, h) {
-    this.width = w;
-    this.height = h; // Add two rows for the top
-
-    this.blockWidth = UI.width / w;
-    this.blockHeight = UI.height / h;
+  constructor() {
+    this.width = BOARD.boardWidth;
+    this.height = BOARD.boardHeight;
 
     this.grid = [...Array(this.height + 2).keys()].map((_) =>
-      Array(this.width).fill(null)
+      Array(this.width).fill(TYPES.EMPTY)
     );
 
     this.currentPiece = this.generatePiece()
     this.landedPieces = []; 
   }
 
+  getGrid = () => this.grid;
+  getWidth = () => this.width;
+  getHeight = () => this.height;
+
   generatePiece() {
     const color = randChoose(ALL_COLORS);
-    const x = Math.floor(Math.random() * this.width);
+    const x = Math.floor(Math.random() * (this.width - 1));
     const y = -2;
-    return new Block(x, y, color, this.blockWidth, this.blockHeight);
-  }
 
-  _canMoveDownOne() {
-    const pos = this.currentPiece.getPos();
-    return (
-      this.currentPiece.getPos().y + 1 < this.height &&
-      this.grid[pos.x][pos.y + 1] == null
-    );
-  }
-
-  _canMoveLeft() {
-    const pos = this.currentPiece.getPos();
-    return (pos.x - 1 >= 0 && this.grid[pos.x - 1][pos.y] != TYPES.B);
-  }
-
-  _canMoveRight() {
-    const pos = this.currentPiece.getPos();
-    return (pos.x + 1 < this.width && this.grid[pos.x + 1][pos.y] != TYPES.B);
-  }
-
-  _canRotate() {
-    const pos = this.currentPiece.getPos();
-    // TODO: implement
-    return true;
+    return new Square(x, y, color);
+    // return new Block(x, y, color);
   }
 
   step(move) {
 
     switch (move) {
       case ACTIONS.ROTATE:
-        this._canRotate() && this.currentPiece.rotate();
+        if (this.currentPiece.canRotate(this))
+          this.currentPiece.rotate();
         break;
       case ACTIONS.LEFT:
-        this._canMoveLeft() && this.currentPiece.moveLeft();
+        if (this.currentPiece.canMoveLeft(this))
+          this.currentPiece.moveLeft();
         break;
       case ACTIONS.RIGHT:
-        this._canMoveRight() && this.currentPiece.moveRight();
+        if (this.currentPiece.canMoveRight(this))
+          this.currentPiece.moveRight();
         break;
       case ACTIONS.DOWN:
-        while (this._canMoveDownOne()) {
+        while (this.currentPiece.canMoveDownOne(this))
           this.currentPiece.moveDownOne();
-        }
         break;
     }
 
-    if (this._canMoveDownOne()) {
+    if (this.currentPiece.canMoveDownOne(this)) {
       this.currentPiece.moveDownOne();
     } else {
       // Add the current piece to landed and update grid
-      this.landedPieces.push(this.currentPiece);
-      const pos = this.currentPiece.getPos();
-      this.grid[pos.x][pos.y] = TYPES.B;
+      this.currentPiece.getBlocks().forEach(block => {
+        const pos = block.getPos();
+        this.grid[pos.x][pos.y] = TYPES.BLOCKED;
+
+        this.landedPieces.push(block);
+      });
 
       // Move on to next piece
       this.currentPiece = this.generatePiece();
@@ -90,10 +68,10 @@ class Board {
     if (showGridlines) {
       stroke(255);
       for (let row = 0; row < this.height; row++) {
-        line(0, row * this.blockHeight, width, row * this.blockHeight);
+        line(0, row * BOARD.blockHeight, width, row * BOARD.blockHeight);
       }
       for (let col = 0; col < this.width; col++) {
-        line(col * this.blockWidth, 0, col * this.blockWidth, height);
+        line(col * BOARD.blockWidth, 0, col * BOARD.blockWidth, height);
       }
     }
 

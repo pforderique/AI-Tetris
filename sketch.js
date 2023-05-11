@@ -1,7 +1,7 @@
 let game;
 
 function setup() {
-  game = new Game(10, 20);
+  game = new Game();
   createCanvas(UI.width, UI.height);
 
 }

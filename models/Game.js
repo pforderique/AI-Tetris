@@ -5,8 +5,8 @@ class STATES {
 }
 
 class Game {
-  constructor(width, height) {
-    this.board = new Board(width, height);
+  constructor() {
+    this.board = new Board();
 
     this.speed = 15; // blocks per second
     this.cycle = millis();
@@ -25,22 +25,18 @@ class Game {
   step() {
     if (millis() - this.cycle < 1000 / this.speed) return;
 
-    print('step');
     this.board.step(this.move);
     this.move = ACTIONS.NONE; // reset move for next step
 
     this.cycle = millis();
   }
 
-  render() {
-    this.board.render(true);
-  }
-
+  render = () => this.board.render(true);
 }
 
 function keyPressed() {
   switch (keyCode) {
-    case '':
+    case 32:
       game.sendMoveInput(ACTIONS.ROTATE);
       break;
     case LEFT_ARROW:

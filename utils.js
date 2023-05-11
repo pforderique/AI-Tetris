@@ -5,6 +5,18 @@ const UI = {
   height: 1000,
 }
 
+const BOARD = {
+  boardWidth: 10,
+  boardHeight: 20,
+  blockWidth: UI.width / 10,
+  blockHeight: UI.height / 20,
+}
+
+const TYPES = {
+  EMPTY: null, // empty
+  BLOCKED: 1, // block
+};
+
 const COLORS = {
   red: color("#E91F1F"),
   blue: color("#2C63F5"),

@@ -19,14 +19,16 @@ class GovStrategy():
         self.P_improved = P_improved
 
     def get_payoff(self, C, B, P):
-        if C > 1 or B > 1 or P > 1:
+        if C >= 1 or B >= 1 or P >= 1:
             C /= 100
             B /= 100
             P /= 100
 
-        cost = 1 if (self.B_improved or self.P_improved) else 2
-        tax = C if self.C_taxed else 0
-        return 1 / (C*CO2_C + B*CO2_B + P*CO2_P) + cost + tax
+        saved_cost_B = (2*B) if (self.B_improved) else .1
+        saved_cost_P = (P) if (self.P_improved) else .1
+
+        tax = C + 0.1 if self.C_taxed else 0
+        return 0.5*C*CO2_C + 2*B*CO2_B + 1*P*CO2_P + saved_cost_B + saved_cost_P + tax
 
     def __str__(self):
         return f'=====\nGov Strategy: {self.name}\n C_improved: {self.C_improved}\n B_improved: {self.B_improved}\n P_improved: {self.P_improved}\n=====\n' 
@@ -45,29 +47,31 @@ class SocietyStrategy():
 
     def _SAT_B(self, improved_infrastructure: bool):
         B = self.B
-        alpha, beta, k = .1, .1, 10
-        utility_from_improvement = 10
+        alpha, beta, k = .5, .1, 10
+        utility_from_improvement = 11
         return alpha*(1 / (k*B + 1))\
                 + beta*max(R*B, 0)\
-                + (utility_from_improvement if improved_infrastructure else 0)
+                + (B*utility_from_improvement if improved_infrastructure else 0)
 
     def _SAT_P(self, improved_infrastructure: bool):
         P = self.P
         C = self.C
-        alpha, beta, k = .1, .1, .1
+        alpha, beta, k = .1, .0001, 10
         utility_from_improvement = 10
         return alpha*(1 / (k*(P*P_CAP + C + 1)))\
-                + beta*max(P_NUM*P_CAP - (P / P_CAP), 0)\
-                + (utility_from_improvement if improved_infrastructure else 0)
+                + beta*max(P*P_NUM*P_CAP, 0)\
+                + (P*utility_from_improvement if improved_infrastructure else 0)
 
     def _SAT_C(self, C_taxed: bool):
         P = self.P
         C = self.C
-        alpha, k = .1, 10
-        v = P*P_NUM/P_CAP + C # proportional to number of vehicles on the road 
-        utility_from_taxation = -100
+        alpha, k = .1, .001
+        v = P*P_NUM/P_CAP + C # proportional to number of vehicles on the road
+        independence = 10 
+        utility_from_taxation = -10
         return alpha*(1 / (k*v + 1))\
-                + (utility_from_taxation if C_taxed else 0)
+                + (C*independence)\
+                + (C*utility_from_taxation if C_taxed else 0)
 
     def __str__(self):
         return '=====\nSociety Strategy\n C: {}\n B: {}\n P: {}\n=====\n'.format(self.C, self.B, self.P)
@@ -82,15 +86,20 @@ def generate_percentage_combinations():
     return all_combinations
 
 def generate_payoff_matrix(gov_strategies, society_strategies, normalize = True):
-    payoff_matrix = [['' for _ in range(len(society_strategies))] for _ in range(len(gov_strategies))]
+    payoff_matrix = [['' for _ in range(len(society_strategies))]\
+                        for _ in range(len(gov_strategies))]
 
-    gov_payoff_matrix = [['' for _ in range(len(society_strategies))] for _ in range(len(gov_strategies))]
-    society_payoff_matrix = [['' for _ in range(len(society_strategies))] for _ in range(len(gov_strategies))]
+    gov_payoff_matrix = [[0 for _ in range(len(society_strategies))]\
+                            for _ in range(len(gov_strategies))]
+    society_payoff_matrix = [[0 for _ in range(len(society_strategies))]\
+                                for _ in range(len(gov_strategies))]
 
     for row, gov_strategy in enumerate(gov_strategies):
         for col, society_strategy in enumerate(society_strategies):
             society_payoff = society_strategy.get_payoff(
-                gov_strategy.C_taxed, gov_strategy.B_improved, gov_strategy.P_improved)
+                gov_strategy.C_taxed, 
+                gov_strategy.B_improved, 
+                gov_strategy.P_improved)
             gov_payoff = gov_strategy.get_payoff(
                 society_strategy.C, society_strategy.B, society_strategy.P)
 
@@ -154,6 +163,13 @@ if __name__ == '__main__':
     ]
     society_strategies = [
         SocietyStrategy(38,15,32),
+        SocietyStrategy(33, 33, 33),
+        SocietyStrategy(50, 50, 0),
+        SocietyStrategy(50, 0, 50),
+        SocietyStrategy(0, 50, 50),
+        SocietyStrategy(100, 0, 0),
+        SocietyStrategy(0, 100, 0),
+        SocietyStrategy(0, 0, 100),
         # SocietyStrategy(*combo) for combo in generate_percentage_combinations()
     ]
 
