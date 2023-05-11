@@ -11,9 +11,12 @@ class Game {
     this.speed = 10; // blocks per second
     this.cycle = millis();
     this.move = ACTIONS.NONE;
+
+    this.paused = false;
   }
 
   setup = () => this.board.setup();
+  pause = () => this.paused = !this.paused;
 
   sendMoveInput(move) {
     console.log('sendMoveInput', move);
@@ -24,8 +27,9 @@ class Game {
    * 
    * @param {ACTIONS} move the move to make 
    */
-  step(fastForward = false) {
-    if (!fastForward && millis() - this.cycle < 1000 / this.speed) return;
+  step() {
+    if (this.paused) return;
+    if (millis() - this.cycle < 1000 / this.speed) return;
 
     this.board.step(this.move);
     this.move = ACTIONS.NONE; // reset move for next step
@@ -39,6 +43,9 @@ class Game {
 function keyPressed() {
   switch (keyCode) {
     case 32:
+      game.pause()
+      break;
+    case UP_ARROW:
       game.sendMoveInput(ACTIONS.ROTATE);
       break;
     case LEFT_ARROW:
