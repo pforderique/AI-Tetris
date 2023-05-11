@@ -13,6 +13,12 @@ const BOARD = {
   blockHeight: UI.height / bh,
 }
 
+const GAME_STATE = {
+  WELCOME: 0,
+  PLAYING: 1,
+  GAMEOVER:  2,
+}
+
 const TYPES = {
   EMPTY: 0, // empty
   BLOCKED: 1, // block

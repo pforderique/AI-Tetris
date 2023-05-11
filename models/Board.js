@@ -16,6 +16,25 @@ class Board {
     this.currentPiece = this.generatePiece();
   }
 
+  render(showGridlines = false) {
+    // Render the gridlines
+    if (showGridlines) {
+      stroke(255);
+      for (let row = 0; row < this.height; row++) {
+        line(0, row * BOARD.blockHeight, width, row * BOARD.blockHeight);
+      }
+      for (let col = 0; col < this.width; col++) {
+        line(col * BOARD.blockWidth, 0, col * BOARD.blockWidth, height);
+      }
+    }
+
+    // Render the current piece
+    this.currentPiece.render();
+
+    // Render the landed pieces
+    this.landedBlocks.forEach((piece) => piece.render());
+  }
+
   generatePiece() {
     const pieceClass = randChoose([Square, Line, T, LeftL, RightL, LeftZ, RightZ]);
     const color = randChoose(ALL_COLORS);
@@ -56,7 +75,9 @@ class Board {
       // Add the current piece to landed and update grid
       this.currentPiece.getBlocks().forEach((block) => {
         const pos = block.getPos();
-        this.grid[pos.y][pos.x] = TYPES.BLOCKED;
+
+        if (this.grid[pos.y])
+          this.grid[pos.y][pos.x] = TYPES.BLOCKED;
 
         this.landedBlocks.push(block);
       });
@@ -70,6 +91,10 @@ class Board {
       // Check for game over (piece is at the top)
       // TODO: Implement game over
     }
+  }
+
+  checkGameOver() {
+    return this.landedBlocks.some((block) => block.getPos().y < 0);
   }
 
   _getFilledRows() {
@@ -98,24 +123,5 @@ class Board {
         .filter((piece) => piece.getPos().y < row)
         .forEach((piece) => piece.moveDownOne());
     }
-  }
-
-  render(showGridlines = false) {
-    // Render the gridlines
-    if (showGridlines) {
-      stroke(255);
-      for (let row = 0; row < this.height; row++) {
-        line(0, row * BOARD.blockHeight, width, row * BOARD.blockHeight);
-      }
-      for (let col = 0; col < this.width; col++) {
-        line(col * BOARD.blockWidth, 0, col * BOARD.blockWidth, height);
-      }
-    }
-
-    // Render the current piece
-    this.currentPiece.render();
-
-    // Render the landed pieces
-    this.landedBlocks.forEach((piece) => piece.render());
   }
 }

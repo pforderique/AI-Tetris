@@ -9,7 +9,7 @@ function setup() {
 function draw() {
   background(0);
 
-  game.step()
+  game.step();
   game.render();
 }
 
@@ -17,7 +17,10 @@ function draw() {
 function keyPressed() {
   switch (keyCode) {
     case 32: // Space
-      game.pause()
+      if (game.getState() === GAME_STATE.WELCOME)
+        game.setState(GAME_STATE.PLAYING);
+      else if (game.getState() === GAME_STATE.PLAYING) game.pause();
+      else if (game.getState() === GAME_STATE.GAMEOVER) game.reset();
       break;
     case 82: // R
       game.setup();
