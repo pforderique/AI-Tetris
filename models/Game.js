@@ -39,23 +39,3 @@ class Game {
 
   render = () => this.board.render(true);
 }
-
-function keyPressed() {
-  switch (keyCode) {
-    case 32:
-      game.pause()
-      break;
-    case UP_ARROW:
-      game.sendMoveInput(ACTIONS.ROTATE);
-      break;
-    case LEFT_ARROW:
-      game.sendMoveInput(ACTIONS.LEFT);
-      break;
-    case RIGHT_ARROW:
-      game.sendMoveInput(ACTIONS.RIGHT);
-      break;
-    case DOWN_ARROW:
-      game.sendMoveInput(ACTIONS.DOWN);
-      break;
-  }
-}
