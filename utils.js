@@ -5,15 +5,16 @@ const UI = {
   height: 1000,
 }
 
+const [bw, bh] = [10, 20].map((x) => x * 1);
 const BOARD = {
-  boardWidth: 10,
-  boardHeight: 20,
-  blockWidth: UI.width / 10,
-  blockHeight: UI.height / 20,
+  boardWidth: bw,
+  boardHeight: bh,
+  blockWidth: UI.width / bw,
+  blockHeight: UI.height / bh,
 }
 
 const TYPES = {
-  EMPTY: null, // empty
+  EMPTY: 0, // empty
   BLOCKED: 1, // block
 };
 

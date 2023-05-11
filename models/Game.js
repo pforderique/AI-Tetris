@@ -13,6 +13,8 @@ class Game {
     this.move = ACTIONS.NONE;
   }
 
+  setup = () => this.board.setup();
+
   sendMoveInput(move) {
     console.log('sendMoveInput', move);
     this.move = move;

@@ -25,7 +25,7 @@ class Piece {
       const pos = block.getPos();
       if (
         pos.y + 1 >= board.getHeight() ||
-        grid[pos.x][pos.y + 1] == TYPES.BLOCKED
+        (grid[pos.y + 1] && grid[pos.y + 1][pos.x] == TYPES.BLOCKED)
       ) {
         return false;
       }
@@ -38,7 +38,10 @@ class Piece {
 
     for (const block of this.blocks) {
       const pos = block.getPos();
-      if (pos.x - 1 < 0 || grid[pos.x - 1][[pos.y]] == TYPES.BLOCKED) {
+      if (
+        pos.x - 1 < 0 ||
+        (grid[pos.y] && grid[pos.y][pos.x - 1] == TYPES.BLOCKED)
+      ) {
         return false;
       }
     }
@@ -52,7 +55,7 @@ class Piece {
       const pos = block.getPos();
       if (
         pos.x + 1 >= board.getWidth() ||
-        grid[pos.x + 1][[pos.y]] == TYPES.BLOCKED
+        (grid[pos.y] && grid[pos.y][pos.x + 1] == TYPES.BLOCKED)
       ) {
         return false;
       }
@@ -86,9 +89,9 @@ class Square extends Piece {
     );
   }
 
-  rotate() {
-    // do nothing
-  }
+  canRotate = () => false;
+
+  rotate() {}
 }
 
 class Line extends Piece {
@@ -102,6 +105,29 @@ class Line extends Piece {
       ],
       color
     );
+  }
+
+  canRotate(board) {
+    const grid = board.getGrid();
+
+    const center = this.blocks[1].getPos();
+    for (const block of this.blocks) {
+      const pos = block.getPos();
+      const x = pos.x - center.x;
+      const y = pos.y - center.y;
+      const newX = center.x - y;
+      const newY = center.y + x;
+      if (
+        newX < 0 ||
+        newX >= board.getWidth() ||
+        newY < 0 ||
+        newY >= board.getHeight() ||
+        (grid[newY] && grid[newY][newX] == TYPES.BLOCKED)
+      ) {
+        return false;
+      }
+    }
+    return true;
   }
 
   rotate() {

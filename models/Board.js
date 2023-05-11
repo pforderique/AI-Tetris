@@ -2,29 +2,37 @@ class Board {
   constructor() {
     this.width = BOARD.boardWidth;
     this.height = BOARD.boardHeight;
-
-    this.grid = [...Array(this.height + 2).keys()].map((_) =>
-      Array(this.width).fill(TYPES.EMPTY)
-    );
-
-    this.currentPiece = this.generatePiece()
-    this.landedPieces = []; 
   }
 
   getGrid = () => this.grid;
   getWidth = () => this.width;
   getHeight = () => this.height;
 
+  setup() {
+    this.grid = [...Array(this.height).keys()].map((_) =>
+      Array(this.width).fill(TYPES.EMPTY)
+    );
+    this.landedPieces = [];
+    this.currentPiece = this.generatePiece();
+  }
+
   generatePiece() {
+    const pieceClass = randChoose([Square, Line]);
     const color = randChoose(ALL_COLORS);
-    const x = Math.floor(Math.random() * (this.width - 1));
+    const x = Math.floor(Math.random() * this.width);
     const y = -2;
 
-    return new Square(x, y, color);
-    // return new Block(x, y, color);
+    const piece = new pieceClass(x, y, color);
+
+    // Make sure piece is in bounds
+    while (!piece.canMoveRight(this)) piece.moveLeft();
+    if (x !== 0) piece.moveRight();
+
+    return piece;
   }
 
   step(move) {
+    if (!this.currentPiece) this.currentPiece = this.generatePiece();
 
     switch (move) {
       case ACTIONS.ROTATE:
@@ -48,10 +56,13 @@ class Board {
     if (this.currentPiece.canMoveDownOne(this)) {
       this.currentPiece.moveDownOne();
     } else {
+      // Check for game over (piece is at the top)
+      // TODO: Implement game over
+
       // Add the current piece to landed and update grid
       this.currentPiece.getBlocks().forEach(block => {
         const pos = block.getPos();
-        this.grid[pos.x][pos.y] = TYPES.BLOCKED;
+        this.grid[pos.y][pos.x] = TYPES.BLOCKED;
 
         this.landedPieces.push(block);
       });

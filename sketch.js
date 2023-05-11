@@ -1,9 +1,9 @@
 let game;
 
 function setup() {
-  game = new Game();
   createCanvas(UI.width, UI.height);
-
+  game = new Game();
+  game.setup();
 }
 
 function draw() {
