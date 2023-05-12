@@ -27,6 +27,11 @@ const TYPES = {
   BLOCKED: 1, // block
 };
 
+const PLAYER = {
+  HUMAN: 0,
+  AI: 1,
+}
+
 const COLORS = {
   red: color("#E91F1F"),
   blue: color("#2C63F5"),

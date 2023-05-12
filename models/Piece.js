@@ -16,13 +16,13 @@ class Piece {
 
   static generatePiece(board) {
     const pieceClass = randChoose([
-      Square,
+      // Square,
       Line,
-      T,
-      LeftL,
-      RightL,
-      LeftZ,
-      RightZ,
+      // T,
+      // LeftL,
+      // RightL,
+      // LeftZ,
+      // RightZ,
     ]);
     const color = randChoose(ALL_COLORS);
     const pieceWidth = new pieceClass(0, 0, color).getWidth();

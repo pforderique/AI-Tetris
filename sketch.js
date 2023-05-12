@@ -1,27 +1,46 @@
+let player;
+
 let game;
+let bot;
+let sim;
 
 function setup() {
   createCanvas(UI.width, UI.height);
+
+  player = PLAYER.AI;
   game = new Game();
+  
+  bot = new RandomBot();
+  sim = new Simulation(game, bot);
+
+  if (player === PLAYER.AI) sim.start();
 }
 
 function draw() {
   background(0);
 
-  game.step();
+  if (player === PLAYER.AI) sim.step();
+  else game.step();
+
   game.render();
 }
 
-// Game controls for Human player
+// Game controls
 function keyPressed() {
   switch (keyCode) {
     case 32: // Space
-      if (game.getState() === GAME_STATE.WELCOME) game.start();
-      else if (game.getState() === GAME_STATE.PLAYING) game.pause();
-      else if (game.getState() === GAME_STATE.GAMEOVER) game.reset();
+      if (game.getState() === GAME_STATE.WELCOME) 
+        game.start();
+      else if (game.getState() === GAME_STATE.PLAYING)
+        game.pause();
+      else if (game.getState() === GAME_STATE.GAMEOVER) {
+        if (player === PLAYER.AI) sim.start();
+        else game.start();
+      }
       break;
     case 82: // R
-      game.start();
+      if (player === PLAYER.AI) sim.start();
+      else game.start();
       break;
     case UP_ARROW:
       game.sendMoveInput(ACTIONS.ROTATE);

@@ -1,6 +1,6 @@
 AI Planning
 =====================
-Goal: Complete as many rows as possible.
+Goal: Complete as many rows as possible, as quickly as possible.
 
 ======================================================
 Tetris Planning
