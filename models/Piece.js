@@ -16,26 +16,20 @@ class Piece {
 
   static generatePiece(board) {
     const pieceClass = randChoose([
-      // Square,
+      Square,
       Line,
-      // T,
-      // LeftL,
-      // RightL,
-      // LeftZ,
-      // RightZ,
+      T,
+      LeftL,
+      RightL,
+      LeftZ,
+      RightZ,
     ]);
     const color = randChoose(ALL_COLORS);
     const pieceWidth = new pieceClass(0, 0, color).getWidth();
     const x = Math.floor(Math.random() * (board.getWidth() - pieceWidth + 1));
     const y = -2;
 
-    const piece = new pieceClass(x, y, color)
-
-    // // Make sure piece is in bounds
-    // while (!piece.canMoveRight(board)) piece.moveLeft();
-    // if (x !== 0) piece.moveRight();
-
-    return piece;
+    return new pieceClass(x, y, color);
   }
 
   getBlocks = () => this.blocks;

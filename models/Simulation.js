@@ -9,6 +9,8 @@ class Simulation {
   constructor(game, bot) {
     this.game = game;
     this.bot = bot;
+
+    this._createStatsHTML();
   }
 
   start() {
@@ -24,9 +26,10 @@ class Simulation {
     if (this.game.getState() === GAME_STATE.WELCOME) this.game.start();
 
     if (this.game.getState() === GAME_STATE.GAMEOVER) {
-      // Record stats after game over
-      this.bot.recordStats(this.game.getScore(), this.game.getGameTime());
-
+      // Update and display stats after game over      
+      this.bot.updateStats(this.game.getScore(), this.game.getGameTime());
+      this._displayStats(this.bot.getStats());
+      
       // Start again if game over and still have games left
       if (++this.gamesPlayed < MAX_GAMES) {
         this.game.start();
@@ -39,4 +42,22 @@ class Simulation {
     if (this.game.step()) this.game.sendMoveInput(this.bot.generateMove());
   }
 
+  _displayStats(stats) {
+    this.gamesPlayedHtml.html(`Games Played: ${stats.gamesPlayed}`);
+    this.bestScoreHtml.html(`Best Score: ${stats.bestScore}`);
+    this.avgScoreHtml.html(`Avg Score: ${stats.avgScore.toFixed(2)}`);
+    this.avgTimeHtml.html(`Avg Time Alive: ${stats.avgTime.toFixed(2)}`);
+  }
+
+  _createStatsHTML() {
+    const statsHTML = createSpan("")
+      .style("width", `${UI.width}px`)
+      .style("display", "inline")
+      .style("font-size", "2rem");
+
+    this.gamesPlayedHtml = createP("Games Played: 0").parent(statsHTML);
+    this.bestScoreHtml = createP("Best Score: 0").parent(statsHTML);
+    this.avgScoreHtml = createP("Avg Score: 0.00").parent(statsHTML);
+    this.avgTimeHtml = createP("Avg Time Alive: 0.00").parent(statsHTML);
+  }
 }
