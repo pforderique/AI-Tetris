@@ -8,25 +8,26 @@ class Game {
 
     this.state = GAME_STATE.WELCOME;
     this.paused = false;
+
+    this.score = 0;
+    this.scoreHTML = this._createScoreHTML();
   }
 
   setup = () => this.board.setup();
 
   reset() {
     this.setup();
-    // start game again
+    this.score = 0;
+    this.scoreHTML.html(`Score: ${this.score}`);
+    // start game again immediately
     this.state = GAME_STATE.PLAYING;
-  }  
-  pause = () => this.paused = !this.paused;
+  }
+  pause = () => (this.paused = !this.paused);
   getState = () => this.state;
-  setState = (state) => this.state = state;
+  setState = (state) => (this.state = state);
 
-  sendMoveInput = (move) => this.move = move;
+  sendMoveInput = (move) => (this.move = move);
 
-  /**
-   * 
-   * @param {ACTIONS} move the move to make 
-   */
   step() {
     if (this.state != GAME_STATE.PLAYING || this.paused) return;
     if (millis() - this.cycle < 1000 / this.speed) return;
@@ -37,13 +38,22 @@ class Game {
     this.cycle = millis();
 
     if (this._checkGameOver()) this.state = GAME_STATE.GAMEOVER;
+
+    this.score = this.board.getRowsCleared();
+    this.scoreHTML.html(`Score: ${this.score}`);
   }
 
   render() {
     switch (this.state) {
-      case GAME_STATE.WELCOME: this._showWelcomeScreen(); break;
-      case GAME_STATE.PLAYING: this._showGameScreen(); break;
-      case GAME_STATE.GAMEOVER: this._showGameOverScreen(); break;
+      case GAME_STATE.WELCOME:
+        this._showWelcomeScreen();
+        break;
+      case GAME_STATE.PLAYING:
+        this._showGameScreen();
+        break;
+      case GAME_STATE.GAMEOVER:
+        this._showGameOverScreen();
+        break;
     }
   }
 
@@ -54,7 +64,7 @@ class Game {
     fill(255);
     textAlign(CENTER, CENTER);
     textSize(32);
-    text('TETRIS\nPress Space to Start', UI.width / 2, UI.height / 2);
+    text("TETRIS\nPress Space to Start", UI.width / 2, UI.height / 2);
   }
 
   _showGameScreen() {
@@ -66,6 +76,18 @@ class Game {
     fill(255);
     textAlign(CENTER, CENTER);
     textSize(32);
-    text('GAME OVER\nPress Space to Restart', UI.width / 2, UI.height / 2);
+    text("GAME OVER\nPress Space to Restart", UI.width / 2, UI.height / 2);
+  }
+
+  _createScoreHTML() {
+    const scoreDiv = createDiv("")
+      .style("width", `${UI.width}px`)
+      .style("text-align", "center");
+
+    return createP("Score:")
+      .style("font-size", "32px")
+      .style("font-weight", "bold")
+      .html(`Score: ${this.score}`)
+      .parent(scoreDiv);
   }
 }

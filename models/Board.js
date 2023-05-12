@@ -2,11 +2,14 @@ class Board {
   constructor() {
     this.width = BOARD.boardWidth;
     this.height = BOARD.boardHeight;
+
+    this.rowsCleared = 0;
   }
 
   getGrid = () => this.grid;
   getWidth = () => this.width;
   getHeight = () => this.height;
+  getRowsCleared = () => this.rowsCleared;
 
   setup() {
     this.grid = [...Array(this.height).keys()].map((_) =>
@@ -15,6 +18,8 @@ class Board {
     this.landedBlocks = [];
     this.currentPiece = Piece.generatePiece(this);
     this.projectedPiece = this.currentPiece.getProjectedPiece(this);
+
+    this.rowsCleared = 0;
   }
 
   render(showGridlines = false) {
@@ -119,5 +124,6 @@ class Board {
         .filter((piece) => piece.getPos().y < row)
         .forEach((piece) => piece.moveDownOne());
     }
+    this.rowsCleared += rows.length;
   }
 }
