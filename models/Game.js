@@ -2,7 +2,7 @@ class Game {
   constructor() {
     this.board = new Board();
 
-    this.speed = 10; // blocks per second
+    this.speed = 100; // blocks per second
     this.move = ACTIONS.NONE;
 
     this.state = GAME_STATE.WELCOME;
@@ -26,12 +26,14 @@ class Game {
     // start game immediately
     this.state = GAME_STATE.PLAYING;
   }
+  sendMoveInput = (move) => (this.move = move);
   pause = () => (this.paused = !this.paused);
+
   getState = () => this.state;
   getScore = () => this.score;
   getGameTime = () => this.gameTime;
-
-  sendMoveInput = (move) => (this.move = move);
+  getSpeed = () => this.speed;
+  getBoard = () => this.board;
 
   step() {
     this.gameTime = (millis() - this.gameTimer) / 1000;

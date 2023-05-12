@@ -1,10 +1,10 @@
-const MAX_GAMES = 3;
+const MAX_GAMES = 2;
 
 class Simulation {
   /**
-   * 
-   * @param {Game} game 
-   * @param {AI} bot 
+   *
+   * @param {Game} game
+   * @param {AI} bot
    */
   constructor(game, bot) {
     this.game = game;
@@ -26,20 +26,34 @@ class Simulation {
     if (this.game.getState() === GAME_STATE.WELCOME) this.game.start();
 
     if (this.game.getState() === GAME_STATE.GAMEOVER) {
-      // Update and display stats after game over      
+      // Update and display stats after game over
       this.bot.updateStats(this.game.getScore(), this.game.getGameTime());
       this._displayStats(this.bot.getStats());
-      
+
       // Start again if game over and still have games left
       if (++this.gamesPlayed < MAX_GAMES) {
         this.game.start();
       } else {
         this.runSimulation = false;
+        print(
+          `Random Bot Stats:\n\tGames Played: ${
+            this.bot.getStats().gamesPlayed
+          }\n\tBest Score: ${
+            this.bot.getStats().bestScore
+          }\n\tAvg Score: ${this.bot
+            .getStats()
+            .avgScore.toFixed(2)}\n\tAvg Time Alive: ${this.bot
+            .getStats()
+            .avgTime.toFixed(2)}\n\t(speed: ${this.game.getSpeed()})`
+        );
       }
     }
 
     // Generate move for AI after every successful step
-    if (this.game.step()) this.game.sendMoveInput(this.bot.generateMove());
+    if (this.game.step()) {
+      const aiMove = this.bot.generateMove(this.game.getBoard());
+      this.game.sendMoveInput(aiMove);
+    }
   }
 
   _displayStats(stats) {
