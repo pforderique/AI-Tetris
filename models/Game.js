@@ -3,34 +3,29 @@ class Game {
     this.board = new Board();
 
     this.speed = 10; // blocks per second
-    this.cycle = millis();
     this.move = ACTIONS.NONE;
 
     this.state = GAME_STATE.WELCOME;
     this.paused = false;
-
-    this.score = 0;
     this.scoreHTML = this._createScoreHTML();
   }
 
-  setup = () => this.board.setup();
-
-  reset() {
-    this.setup();
+  start() {
+    this.board.setup();
+    this.cycle = millis();
     this.score = 0;
     this.scoreHTML.html(`Score: ${this.score}`);
-    // start game again immediately
+    // start game immediately
     this.state = GAME_STATE.PLAYING;
   }
   pause = () => (this.paused = !this.paused);
   getState = () => this.state;
-  setState = (state) => (this.state = state);
 
   sendMoveInput = (move) => (this.move = move);
 
   step() {
-    if (this.state != GAME_STATE.PLAYING || this.paused) return;
-    if (millis() - this.cycle < 1000 / this.speed) return;
+    if (this.state != GAME_STATE.PLAYING || this.paused) return false;
+    if (millis() - this.cycle < 1000 / this.speed) return false;
 
     this.board.step(this.move);
     this.move = ACTIONS.NONE; // reset move for next step
@@ -41,6 +36,8 @@ class Game {
 
     this.score = this.board.getRowsCleared();
     this.scoreHTML.html(`Score: ${this.score}`);
+
+    return true;
   }
 
   render() {
@@ -87,7 +84,7 @@ class Game {
     return createP("Score:")
       .style("font-size", "32px")
       .style("font-weight", "bold")
-      .html(`Score: ${this.score}`)
+      .html(`Score: 0`)
       .parent(scoreDiv);
   }
 }

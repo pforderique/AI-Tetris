@@ -3,7 +3,6 @@ let game;
 function setup() {
   createCanvas(UI.width, UI.height);
   game = new Game();
-  game.setup();
 }
 
 function draw() {
@@ -13,17 +12,16 @@ function draw() {
   game.render();
 }
 
-// Game controls
+// Game controls for Human player
 function keyPressed() {
   switch (keyCode) {
     case 32: // Space
-      if (game.getState() === GAME_STATE.WELCOME)
-        game.setState(GAME_STATE.PLAYING);
+      if (game.getState() === GAME_STATE.WELCOME) game.start();
       else if (game.getState() === GAME_STATE.PLAYING) game.pause();
       else if (game.getState() === GAME_STATE.GAMEOVER) game.reset();
       break;
     case 82: // R
-      game.reset();
+      game.start();
       break;
     case UP_ARROW:
       game.sendMoveInput(ACTIONS.ROTATE);

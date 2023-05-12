@@ -1,3 +1,10 @@
+AI Planning
+=====================
+Goal: Complete as many rows as possible.
+
+======================================================
+Tetris Planning
+======================
 sketch.js
 game = Game(size=...)
 
