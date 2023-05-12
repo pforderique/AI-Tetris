@@ -25,19 +25,25 @@ class Piece {
       RightZ,
     ]);
     const color = randChoose(ALL_COLORS);
-    const x = Math.floor(Math.random() * board.getWidth());
+    const pieceWidth = new pieceClass(0, 0, color).getWidth();
+    const x = Math.floor(Math.random() * (board.getWidth() - pieceWidth + 1));
     const y = -2;
 
-    const piece = new pieceClass(x, y, color);
+    const piece = new pieceClass(x, y, color)
 
-    // Make sure piece is in bounds
-    while (!piece.canMoveRight(board)) piece.moveLeft();
-    if (x !== 0) piece.moveRight();
+    // // Make sure piece is in bounds
+    // while (!piece.canMoveRight(board)) piece.moveLeft();
+    // if (x !== 0) piece.moveRight();
 
     return piece;
   }
 
   getBlocks = () => this.blocks;
+
+  getWidth() {
+    const xs = this.blocks.map((block) => block.getPos().x);
+    return Math.max(...xs) - Math.min(...xs) + 1;
+  }
 
   moveDownOne() {
     this.pos.y++;

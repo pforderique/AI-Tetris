@@ -23,7 +23,7 @@ function keyPressed() {
       else if (game.getState() === GAME_STATE.GAMEOVER) game.reset();
       break;
     case 82: // R
-      game.setup();
+      game.reset();
       break;
     case UP_ARROW:
       game.sendMoveInput(ACTIONS.ROTATE);

@@ -21,10 +21,7 @@ class Game {
   getState = () => this.state;
   setState = (state) => this.state = state;
 
-  sendMoveInput(move) {
-    console.log('sendMoveInput', move);
-    this.move = move;
-  }
+  sendMoveInput = (move) => this.move = move;
 
   /**
    * 

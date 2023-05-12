@@ -13,7 +13,7 @@ class Board {
       Array(this.width).fill(TYPES.EMPTY)
     );
     this.landedBlocks = [];
-    this.currentPiece = this.generatePiece();
+    this.currentPiece = Piece.generatePiece(this);
     this.projectedPiece = this.currentPiece.getProjectedPiece(this);
   }
 
@@ -39,31 +39,8 @@ class Board {
     this.currentPiece.render();
   }
 
-  generatePiece() {
-    const pieceClass = randChoose([
-      Square,
-      Line,
-      T,
-      LeftL,
-      RightL,
-      LeftZ,
-      RightZ,
-    ]);
-    const color = randChoose(ALL_COLORS);
-    const x = Math.floor(Math.random() * this.width);
-    const y = -2;
-
-    const piece = new pieceClass(x, y, color);
-
-    // Make sure piece is in bounds
-    while (!piece.canMoveRight(this)) piece.moveLeft();
-    if (x !== 0) piece.moveRight();
-
-    return piece;
-  }
-
   step(move) {
-    if (!this.currentPiece) this.currentPiece = this.generatePiece();
+    if (!this.currentPiece) this.currentPiece = Piece.generatePiece(this);
 
     switch (move) {
       case ACTIONS.ROTATE:
@@ -106,7 +83,7 @@ class Board {
       this._removeRows(this._getFilledRows());
 
       // Move on to next piece
-      this.currentPiece = this.generatePiece();
+      this.currentPiece = Piece.generatePiece(this);
       this.projectedPiece = this.currentPiece.getProjectedPiece(this);
     }
   }
