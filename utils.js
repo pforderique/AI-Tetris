@@ -35,6 +35,7 @@ const COLORS = {
 };
 
 const ALL_COLORS = Object.values(COLORS);
+const TRANSPARENT = color(0, 255)
 
 const ACTIONS = {
   NONE: "none",

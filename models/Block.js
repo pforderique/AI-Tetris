@@ -1,11 +1,20 @@
 class Block {
-  constructor(x, y, color) {
+  constructor(x, y, color, isGhost = false) {
     this.color = color;
     this.pos = createVector(x, y);
+    this.isGhost = isGhost;
   }
 
   render() {
-    fill(this.color);
+    if (this.isGhost) {
+      strokeWeight(2);
+      stroke(this.color)
+      fill(TRANSPARENT);
+    } else {
+      strokeWeight(1);
+      stroke(0);
+      fill(this.color);
+    }
     rect(
       this.pos.x * BOARD.blockWidth,
       this.pos.y * BOARD.blockHeight,
@@ -24,6 +33,7 @@ class Block {
   moveLeft() {
     this.pos.x -= 1;
   }
+
   moveRight() {
     this.pos.x += 1;
   }

@@ -14,6 +14,7 @@ class Board {
     );
     this.landedBlocks = [];
     this.currentPiece = this.generatePiece();
+    this.projectedPiece = this.currentPiece.getProjectedPiece(this);
   }
 
   render(showGridlines = false) {
@@ -28,15 +29,26 @@ class Board {
       }
     }
 
-    // Render the current piece
-    this.currentPiece.render();
-
     // Render the landed pieces
     this.landedBlocks.forEach((piece) => piece.render());
+
+    // Render the projected piece
+    this.projectedPiece.render();
+
+    // Render the current piece
+    this.currentPiece.render();
   }
 
   generatePiece() {
-    const pieceClass = randChoose([Square, Line, T, LeftL, RightL, LeftZ, RightZ]);
+    const pieceClass = randChoose([
+      Square,
+      Line,
+      T,
+      LeftL,
+      RightL,
+      LeftZ,
+      RightZ,
+    ]);
     const color = randChoose(ALL_COLORS);
     const x = Math.floor(Math.random() * this.width);
     const y = -2;
@@ -55,13 +67,22 @@ class Board {
 
     switch (move) {
       case ACTIONS.ROTATE:
-        if (this.currentPiece.canRotate(this)) this.currentPiece.rotate();
+        if (this.currentPiece.canRotate(this)) {
+          this.currentPiece.rotate();
+          this.projectedPiece = this.currentPiece.getProjectedPiece(this);
+        }
         break;
       case ACTIONS.LEFT:
-        if (this.currentPiece.canMoveLeft(this)) this.currentPiece.moveLeft();
+        if (this.currentPiece.canMoveLeft(this)) {
+          this.currentPiece.moveLeft();
+          this.projectedPiece = this.currentPiece.getProjectedPiece(this);
+        }
         break;
       case ACTIONS.RIGHT:
-        if (this.currentPiece.canMoveRight(this)) this.currentPiece.moveRight();
+        if (this.currentPiece.canMoveRight(this)) {
+          this.currentPiece.moveRight();
+          this.projectedPiece = this.currentPiece.getProjectedPiece(this);
+        }
         break;
       case ACTIONS.DOWN:
         while (this.currentPiece.canMoveDownOne(this))
@@ -76,8 +97,7 @@ class Board {
       this.currentPiece.getBlocks().forEach((block) => {
         const pos = block.getPos();
 
-        if (this.grid[pos.y])
-          this.grid[pos.y][pos.x] = TYPES.BLOCKED;
+        if (this.grid[pos.y]) this.grid[pos.y][pos.x] = TYPES.BLOCKED;
 
         this.landedBlocks.push(block);
       });
@@ -87,9 +107,7 @@ class Board {
 
       // Move on to next piece
       this.currentPiece = this.generatePiece();
-
-      // Check for game over (piece is at the top)
-      // TODO: Implement game over
+      this.projectedPiece = this.currentPiece.getProjectedPiece(this);
     }
   }
 
@@ -116,7 +134,8 @@ class Board {
 
       // Remove landed pieces on this row
       this.landedBlocks = this.landedBlocks.filter(
-        (piece) => piece.getPos().y != row);
+        (piece) => piece.getPos().y != row
+      );
 
       // Move down all landed pieces above this row
       this.landedBlocks

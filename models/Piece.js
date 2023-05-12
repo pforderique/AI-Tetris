@@ -1,18 +1,75 @@
 class Piece {
-  constructor(coordinates, color) {
+  constructor(coordinates, color, rotations = 0, isGhost = false) {
     this.pos = coordinates[0];
+    this.color = color;
+    this.isGhost = isGhost;
     this.blocks = coordinates.map(
-      (coord) => new Block(coord.x, coord.y, color)
+      (coord) => new Block(coord.x, coord.y, color, isGhost)
     );
+
+    for (let _ = 0; _ < rotations % 4; _++) {
+      this.rotate();
+    }
+
+    this.rotations = rotations % 4;
+  }
+
+  static generatePiece(board) {
+    const pieceClass = randChoose([
+      Square,
+      Line,
+      T,
+      LeftL,
+      RightL,
+      LeftZ,
+      RightZ,
+    ]);
+    const color = randChoose(ALL_COLORS);
+    const x = Math.floor(Math.random() * board.getWidth());
+    const y = -2;
+
+    const piece = new pieceClass(x, y, color);
+
+    // Make sure piece is in bounds
+    while (!piece.canMoveRight(board)) piece.moveLeft();
+    if (x !== 0) piece.moveRight();
+
+    return piece;
   }
 
   getBlocks = () => this.blocks;
 
-  moveDownOne = () => this.blocks.forEach((block) => block.moveDownOne());
+  moveDownOne() {
+    this.pos.y++;
+    this.blocks.forEach((block) => block.moveDownOne());
+  }
 
-  moveLeft = () => this.blocks.forEach((block) => block.moveLeft());
+  moveLeft() {
+    this.pos.x--;
+    this.blocks.forEach((block) => block.moveLeft());
+  }
 
-  moveRight = () => this.blocks.forEach((block) => block.moveRight());
+  moveRight() {
+    this.pos.x++;
+    this.blocks.forEach((block) => block.moveRight());
+  }
+
+  getProjectedPiece(board) {
+    const { x, y } = this.getPos();
+    const projectedPiece = new this.constructor(
+      x,
+      y,
+      this.color,
+      this.rotations,
+      true
+    );
+
+    while (projectedPiece.canMoveDownOne(board)) {
+      projectedPiece.moveDownOne();
+    }
+
+    return projectedPiece;
+  }
 
   rotate() {
     throw new Error("Piece must implement rotate()");
@@ -63,7 +120,7 @@ class Piece {
     return true;
   }
 
-  canRotate(grid) {
+  canRotate(board) {
     throw new Error("Piece must implement canRotate()");
   }
 
@@ -77,7 +134,7 @@ class Piece {
 }
 
 class Square extends Piece {
-  constructor(x, y, color) {
+  constructor(x, y, color, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -85,17 +142,19 @@ class Square extends Piece {
         { x, y: y + 1 },
         { x: x + 1, y: y + 1 },
       ],
-      color
+      color,
+      rotations,
+      isGhost
     );
   }
 
   canRotate = () => false;
 
-  rotate() {}
+  rotate = () => this.rotations = (this.rotations + 1) % 4;
 }
 
 class Line extends Piece {
-  constructor(x, y, color) {
+  constructor(x, y, color, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -103,7 +162,9 @@ class Line extends Piece {
         { x: x + 2, y },
         { x: x + 3, y },
       ],
-      color
+      color,
+      rotations,
+      isGhost
     );
   }
 
@@ -139,11 +200,12 @@ class Line extends Piece {
       block.pos.x = center.x - y;
       block.pos.y = center.y + x;
     }
+    this.rotations = (this.rotations + 1) % 4;
   }
 }
 
 class T extends Piece {
-  constructor(x, y, color) {
+  constructor(x, y, color, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -151,7 +213,9 @@ class T extends Piece {
         { x: x + 2, y },
         { x: x + 1, y: y + 1 },
       ],
-      color
+      color,
+      rotations,
+      isGhost
     );
   }
 
@@ -187,11 +251,12 @@ class T extends Piece {
       block.pos.x = center.x - y;
       block.pos.y = center.y + x;
     }
+    this.rotations = (this.rotations + 1) % 4;
   }
 }
 
 class LeftL extends Piece {
-  constructor(x, y, color) {
+  constructor(x, y, color, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -199,7 +264,9 @@ class LeftL extends Piece {
         { x, y: y + 2 },
         { x: x + 1, y: y + 2 },
       ],
-      color
+      color,
+      rotations,
+      isGhost
     );
   }
 
@@ -235,11 +302,12 @@ class LeftL extends Piece {
       block.pos.x = center.x - y;
       block.pos.y = center.y + x;
     }
+    this.rotations = (this.rotations + 1) % 4;
   }
 }
 
 class RightL extends Piece {
-  constructor(x, y, color) {
+  constructor(x, y, color, rotations = 0, isGhost = false) {
     super(
       [
         { x, y: y + 2 },
@@ -247,7 +315,9 @@ class RightL extends Piece {
         { x: x + 1, y: y + 1 },
         { x: x + 1, y: y + 2 },
       ],
-      color
+      color,
+      rotations,
+      isGhost
     );
   }
 
@@ -283,11 +353,12 @@ class RightL extends Piece {
       block.pos.x = center.x - y;
       block.pos.y = center.y + x;
     }
+    this.rotations = (this.rotations + 1) % 4;
   }
 }
 
 class LeftZ extends Piece {
-  constructor(x, y, color) {
+  constructor(x, y, color, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -295,7 +366,9 @@ class LeftZ extends Piece {
         { x: x + 1, y: y + 1 },
         { x: x + 2, y: y + 1 },
       ],
-      color
+      color,
+      rotations,
+      isGhost
     );
   }
 
@@ -331,11 +404,12 @@ class LeftZ extends Piece {
       block.pos.x = center.x - y;
       block.pos.y = center.y + x;
     }
+    this.rotations = (this.rotations + 1) % 4;
   }
 }
 
 class RightZ extends Piece {
-  constructor(x, y, color) {
+  constructor(x, y, color, rotations = 0, isGhost = false) {
     super(
       [
         { x, y: y + 1 },
@@ -343,7 +417,9 @@ class RightZ extends Piece {
         { x: x + 1, y },
         { x: x + 2, y },
       ],
-      color
+      color,
+      rotations,
+      isGhost
     );
   }
 
@@ -379,5 +455,6 @@ class RightZ extends Piece {
       block.pos.x = center.x - y;
       block.pos.y = center.y + x;
     }
+    this.rotations = (this.rotations + 1) % 4;
   }
 }
