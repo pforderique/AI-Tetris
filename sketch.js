@@ -1,17 +1,14 @@
 let player;
 
 let game;
-let bot;
 let sim;
 
 function setup() {
   createCanvas(UI.width, UI.height);
 
   player = PLAYER.AI;
-  game = new Game();
-  
-  bot = new RandomBot();
-  sim = new Simulation(game, bot);
+  game = new Game(100); // speed in blocks per second
+  sim = new Simulation(game);
 
   if (player === PLAYER.AI) sim.start();
 }

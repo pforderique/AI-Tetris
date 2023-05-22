@@ -1,8 +1,8 @@
 class Game {
-  constructor() {
+  constructor(speed = 10) {
     this.board = new Board();
 
-    this.speed = 100; // blocks per second
+    this.speed = speed; // blocks per second
     this.move = ACTIONS.NONE;
 
     this.state = GAME_STATE.WELCOME;

@@ -1,8 +1,8 @@
 new p5();
 
 const UI = {
-  width: 500,
-  height: 1000,
+  width: 250,
+  height: 500,
   // width: 700,
   // height: 1300,
   // // with 20, 40 blocks also works

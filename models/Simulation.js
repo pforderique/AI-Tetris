@@ -1,14 +1,13 @@
-const MAX_GAMES = 2;
+const MAX_GAMES = 100;
 
 class Simulation {
   /**
    *
    * @param {Game} game
-   * @param {AI} bot
    */
-  constructor(game, bot) {
+  constructor(game) {
     this.game = game;
-    this.bot = bot;
+    this.bot = new RandomBot(game);
 
     this._createStatsHTML();
   }
@@ -66,8 +65,7 @@ class Simulation {
   _createStatsHTML() {
     const statsHTML = createSpan("")
       .style("width", `${UI.width}px`)
-      .style("display", "inline")
-      .style("font-size", "2rem");
+      .style("font-size", "1.6rem");
 
     this.gamesPlayedHtml = createP("Games Played: 0").parent(statsHTML);
     this.bestScoreHtml = createP("Best Score: 0").parent(statsHTML);

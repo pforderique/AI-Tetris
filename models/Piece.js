@@ -26,7 +26,8 @@ class Piece {
     ]);
     const color = randChoose(ALL_COLORS);
     const pieceWidth = new pieceClass(0, 0, color).getWidth();
-    const x = Math.floor(Math.random() * (board.getWidth() - pieceWidth + 1));
+    // Always spawn in the middle of the board
+    const x = Math.floor(board.getWidth() / 2 - pieceWidth / 2);
     const y = -2;
 
     return new pieceClass(x, y, color);

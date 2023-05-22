@@ -1,5 +1,6 @@
 class AI {
-  constructor() {
+  constructor(game) {
+    this.game = game;
     this.stats = {
       gamesPlayed: 0,
       bestScore: 0,
@@ -27,12 +28,39 @@ class AI {
 }
 
 class RandomBot extends AI {
-  constructor() {
-    super();
+  constructor(game) {
+    super(game);
   }
 
   generateMove(board) {
     const randomMove = randChoose(Object.values(ACTIONS));
     return randomMove;
+  }
+}
+
+class GeneticBot extends AI {
+  constructor(game) {
+    super(game);
+  }
+
+  generateMove(board) {
+    const randomMove = randChoose(Object.values(ACTIONS));
+    return randomMove;
+  }
+
+  _getFitness(board) {
+    let fitness = 0
+
+    const aggregateHeight = 0;
+    const numHoles = 0;
+    const completeLines = 0;
+    const bumpiness = 0;
+    const rowTransitions = 0;
+    const columnTransitions = 0;
+    const numPits = 0;
+    const deepestWell = 0; // Might not need
+    const numLinesCleared = 0;
+
+    return fitness;
   }
 }
