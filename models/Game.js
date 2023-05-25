@@ -26,7 +26,11 @@ class Game {
     // start game immediately
     this.state = GAME_STATE.PLAYING;
   }
-  sendMoveInput = (move) => (this.move = move);
+  sendMoveInput (move) {
+    this.move = move;
+
+    if (move === ACTIONS.DOWN) this.score += 0.125;
+  }
   pause = () => (this.paused = !this.paused);
 
   getState = () => this.state;
@@ -42,7 +46,7 @@ class Game {
     if (this.state != GAME_STATE.PLAYING || this.paused) return false;
     if (millis() - this.cycle < 1000 / this.speed) return false;
 
-    this.board.step(this.move);
+    const rowsCleared = this.board.step(this.move);
     this.move = ACTIONS.NONE; // reset move for next step
 
     this.cycle = millis();
@@ -52,7 +56,7 @@ class Game {
       this.gameTime = (millis() - this.gameTimer) / 1000;
     }
 
-    this.score = this.board.getRowsCleared();
+    this.score += rowsCleared;
     this.scoreHTML.html(`Score: ${this.score}`);
 
     return true;
@@ -78,7 +82,7 @@ class Game {
     background(0);
     fill(255);
     textAlign(CENTER, CENTER);
-    textSize(32);
+    textSize(UI.width / 500 * 32);
     text("TETRIS\nPress Space to Start", UI.width / 2, UI.height / 2);
   }
 
@@ -90,7 +94,7 @@ class Game {
     background(0);
     fill(255);
     textAlign(CENTER, CENTER);
-    textSize(32);
+    textSize(UI.width / 500 * 32);
     text("GAME OVER\nPress Space to Restart", UI.width / 2, UI.height / 2);
   }
 

@@ -6,8 +6,8 @@ let sim;
 function setup() {
   createCanvas(UI.width, UI.height);
 
-  player = PLAYER.AI;
-  game = new Game(100); // speed in blocks per second
+  player = PLAYER.HUMAN;
+  game = new Game(10); // speed in blocks per second
   sim = new Simulation(game);
 
   if (player === PLAYER.AI) sim.start();

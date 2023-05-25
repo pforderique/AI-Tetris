@@ -2,14 +2,11 @@ class Board {
   constructor() {
     this.width = BOARD.boardWidth;
     this.height = BOARD.boardHeight;
-
-    this.rowsCleared = 0;
   }
 
   getGrid = () => this.grid;
   getWidth = () => this.width;
   getHeight = () => this.height;
-  getRowsCleared = () => this.rowsCleared;
 
   setup() {
     this.grid = [...Array(this.height).keys()].map((_) =>
@@ -18,8 +15,6 @@ class Board {
     this.landedBlocks = [];
     this.currentPiece = Piece.generatePiece(this);
     this.projectedPiece = this.currentPiece.getProjectedPiece(this);
-
-    this.rowsCleared = 0;
   }
 
   render(showGridlines = false) {
@@ -44,9 +39,46 @@ class Board {
     this.currentPiece.render();
   }
 
+  /**
+   * 
+   * @param {ACTIONS} move action to perform
+   * @returns number of rows cleared
+   */
   step(move) {
     if (!this.currentPiece) this.currentPiece = Piece.generatePiece(this);
+    this._handleMove(move);
 
+    if (this.currentPiece.canMoveDownOne(this)) {
+      this.currentPiece.moveDownOne();
+    } else {
+      // Add the current piece to landed and update grid
+      this.currentPiece.getBlocks().forEach((block) => {
+        const pos = block.getPos();
+
+        if (this.grid[pos.y]) this.grid[pos.y][pos.x] = TYPES.BLOCKED;
+
+        this.landedBlocks.push(block);
+      });
+
+      // Check for full rows and remove them
+      const filledRows = this._getFilledRows()
+      this._removeRows(filledRows);
+
+      // Move on to next piece
+      this.currentPiece = Piece.generatePiece(this);
+      this.projectedPiece = this.currentPiece.getProjectedPiece(this);
+
+      return filledRows.length;
+    }
+
+    return 0;
+  }
+
+  checkGameOver() {
+    return this.landedBlocks.some((block) => block.getPos().y < 0);
+  }
+
+  _handleMove(move) {
     switch (move) {
       case ACTIONS.ROTATE:
         if (this.currentPiece.canRotate(this)) {
@@ -71,30 +103,6 @@ class Board {
           this.currentPiece.moveDownOne();
         break;
     }
-
-    if (this.currentPiece.canMoveDownOne(this)) {
-      this.currentPiece.moveDownOne();
-    } else {
-      // Add the current piece to landed and update grid
-      this.currentPiece.getBlocks().forEach((block) => {
-        const pos = block.getPos();
-
-        if (this.grid[pos.y]) this.grid[pos.y][pos.x] = TYPES.BLOCKED;
-
-        this.landedBlocks.push(block);
-      });
-
-      // Check for full rows and remove them
-      this._removeRows(this._getFilledRows());
-
-      // Move on to next piece
-      this.currentPiece = Piece.generatePiece(this);
-      this.projectedPiece = this.currentPiece.getProjectedPiece(this);
-    }
-  }
-
-  checkGameOver() {
-    return this.landedBlocks.some((block) => block.getPos().y < 0);
   }
 
   _getFilledRows() {
@@ -124,6 +132,5 @@ class Board {
         .filter((piece) => piece.getPos().y < row)
         .forEach((piece) => piece.moveDownOne());
     }
-    this.rowsCleared += rows.length;
   }
 }
