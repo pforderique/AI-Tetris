@@ -24,14 +24,13 @@ class Piece {
       LeftZ,
       RightZ,
     ]);
-    const color = randChoose(ALL_COLORS);
     const pieceWidth = new pieceClass(0, 0, color).getWidth();
     // Always spawn in the middle of the board
     const x =
       board.getXOffset() + Math.floor(board.getWidth() / 2 - pieceWidth / 2);
     const y = board.getYOffset() - 2;
 
-    return new pieceClass(x, y, color);
+    return new pieceClass(x, y);
   }
 
   getBlocks = () => this.blocks;
@@ -86,7 +85,8 @@ class Piece {
 
       if (
         localPos.y + 1 >= board.getHeight() ||
-        (grid[localPos.y + 1] && grid[localPos.y + 1][localPos.x] == TYPES.BLOCKED)
+        (grid[localPos.y + 1] &&
+          grid[localPos.y + 1][localPos.x] == TYPES.BLOCKED)
       ) {
         return false;
       }
@@ -140,7 +140,7 @@ class Piece {
 }
 
 class Square extends Piece {
-  constructor(x, y, color, rotations = 0, isGhost = false) {
+  constructor(x, y, color = COLORS.yellow, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -160,7 +160,7 @@ class Square extends Piece {
 }
 
 class Line extends Piece {
-  constructor(x, y, color, rotations = 0, isGhost = false) {
+  constructor(x, y, color = COLORS.lightblue, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -186,7 +186,10 @@ class Line extends Piece {
       const worldNewX = center.x - y;
       const worldNewY = center.y + x;
 
-      const {newX, newY} = board.blockWorld2Local({x: worldNewX, y: worldNewY});
+      const { newX, newY } = board.blockWorld2Local({
+        x: worldNewX,
+        y: worldNewY,
+      });
 
       if (
         newX < 0 ||
@@ -215,7 +218,7 @@ class Line extends Piece {
 }
 
 class T extends Piece {
-  constructor(x, y, color, rotations = 0, isGhost = false) {
+  constructor(x, y, color = COLORS.purple, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -240,7 +243,10 @@ class T extends Piece {
       const worldNewX = center.x - y;
       const worldNewY = center.y + x;
 
-      const {newX, newY} = board.blockWorld2Local({x: worldNewX, y: worldNewY});
+      const { newX, newY } = board.blockWorld2Local({
+        x: worldNewX,
+        y: worldNewY,
+      });
       if (
         newX < 0 ||
         newX >= board.getWidth() ||
@@ -268,7 +274,7 @@ class T extends Piece {
 }
 
 class LeftL extends Piece {
-  constructor(x, y, color, rotations = 0, isGhost = false) {
+  constructor(x, y, color = COLORS.orange, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -292,7 +298,10 @@ class LeftL extends Piece {
       const y = pos.y - center.y;
       const worldNewX = center.x - y;
       const worldNewY = center.y + x;
-      const {newX, newY} = board.blockWorld2Local({x: worldNewX, y: worldNewY});
+      const { newX, newY } = board.blockWorld2Local({
+        x: worldNewX,
+        y: worldNewY,
+      });
       if (
         newX < 0 ||
         newX >= board.getWidth() ||
@@ -320,7 +329,7 @@ class LeftL extends Piece {
 }
 
 class RightL extends Piece {
-  constructor(x, y, color, rotations = 0, isGhost = false) {
+  constructor(x, y, color = COLORS.blue, rotations = 0, isGhost = false) {
     super(
       [
         { x, y: y + 2 },
@@ -344,7 +353,10 @@ class RightL extends Piece {
       const y = pos.y - center.y;
       const worldNewX = center.x - y;
       const worldNewY = center.y + x;
-      const {newX, newY} = board.blockWorld2Local({x: worldNewX, y: worldNewY});
+      const { newX, newY } = board.blockWorld2Local({
+        x: worldNewX,
+        y: worldNewY,
+      });
       if (
         newX < 0 ||
         newX >= board.getWidth() ||
@@ -372,7 +384,7 @@ class RightL extends Piece {
 }
 
 class LeftZ extends Piece {
-  constructor(x, y, color, rotations = 0, isGhost = false) {
+  constructor(x, y, color = COLORS.red, rotations = 0, isGhost = false) {
     super(
       [
         { x, y },
@@ -396,7 +408,10 @@ class LeftZ extends Piece {
       const y = pos.y - center.y;
       const worldNewX = center.x - y;
       const worldNewY = center.y + x;
-      const {newX, newY} = board.blockWorld2Local({x: worldNewX, y: worldNewY});
+      const { newX, newY } = board.blockWorld2Local({
+        x: worldNewX,
+        y: worldNewY,
+      });
       if (
         newX < 0 ||
         newX >= board.getWidth() ||
@@ -424,7 +439,7 @@ class LeftZ extends Piece {
 }
 
 class RightZ extends Piece {
-  constructor(x, y, color, rotations = 0, isGhost = false) {
+  constructor(x, y, color = COLORS.green, rotations = 0, isGhost = false) {
     super(
       [
         { x, y: y + 1 },
@@ -448,7 +463,10 @@ class RightZ extends Piece {
       const y = pos.y - center.y;
       const worldNewX = center.x - y;
       const worldNewY = center.y + x;
-      const {newX, newY} = board.blockWorld2Local({x: worldNewX, y: worldNewY});
+      const { newX, newY } = board.blockWorld2Local({
+        x: worldNewX,
+        y: worldNewY,
+      });
       if (
         newX < 0 ||
         newX >= board.getWidth() ||

@@ -4,8 +4,6 @@ class Board {
     this.y = y;
     this.width = BOARD.boardWidth;
     this.height = BOARD.boardHeight;
-
-    print(`Board created at (${this.x}, ${this.y}).`);
   }
 
   getGrid = () => this.grid;
