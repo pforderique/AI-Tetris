@@ -27,13 +27,13 @@ function draw() {
 function keyPressed() {
   switch (keyCode) {
     case 32: // Space
-      if (game.getState() === GAME_STATE.WELCOME) 
-        game.start();
-      else if (game.getState() === GAME_STATE.PLAYING)
-        game.pause();
-      else if (game.getState() === GAME_STATE.GAMEOVER) {
-        if (player === PLAYER.AI) sim.start();
-        else game.start();
+      const obj = player === PLAYER.AI ? sim : game;
+      if (obj.getState() === GAME_STATE.WELCOME) 
+        obj.start();
+      else if (obj.getState() === GAME_STATE.PLAYING)
+        obj.pause();
+      else if (obj.getState() === GAME_STATE.GAMEOVER) {
+        obj.start();
       }
       break;
     case 82: // R

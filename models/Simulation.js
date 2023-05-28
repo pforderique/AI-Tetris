@@ -31,6 +31,10 @@ class Simulation {
     // this.gamesPlayed = 0;
   }
 
+  pause() {
+    this.sims.map((sim) => sim.game.pause());
+  }
+
   step() {
     // Automatically start game if on welcome screen
     for (const sim of this.sims){
@@ -74,8 +78,18 @@ class Simulation {
   }
 
   render() {
-    // TODO: Render in reverse to avoid overlapping pieces from different games
-    this.sims.forEach((sim) => sim.game.render());
+    for (let idx = this.sims.length - 1; idx >= 0; idx--) {
+      const sim = this.sims[idx];
+      sim.game.render();
+    }
+  }
+
+  getState() {
+    if (this.sims.every((sim) => sim.game.getState() === GAME_STATE.GAMEOVER))
+      return GAME_STATE.GAMEOVER;
+    else if (this.sims.every((sim) => sim.game.getState() === GAME_STATE.WELCOME))
+      return GAME_STATE.WELCOME;
+    else return GAME_STATE.PLAYING;
   }
 
   _displayStats(stats) {
