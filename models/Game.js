@@ -1,15 +1,16 @@
 class Game {
-  constructor(speed = 10) {
-    this.board = new Board();
-
-    this.speed = speed; // blocks per second
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.board = new Board(x, y);
     this.move = ACTIONS.NONE;
 
     this.state = GAME_STATE.WELCOME;
     this.paused = false;
-    [this.timeHTML, this.scoreHTML] = this._createHTML();
-
     this.gameTime = 0;
+
+    if (player === PLAYER.HUMAN)
+      [this.timeHTML, this.scoreHTML] = this._createHTML();
   }
 
   start() {
@@ -18,33 +19,37 @@ class Game {
     this.gameTimer = millis(); // How much time has passed since game started
 
     this.score = 0;
-    this.scoreHTML.html(`Score: ${this.score}`);
-
     this.gameTime = 0;
-    this.timeHTML.html(`Time: ${this.gameTime.toFixed(2)}`);
+
+    if (player === PLAYER.HUMAN) {
+      this.scoreHTML.html(`Score: ${this.score}`);
+      this.timeHTML.html(`Time: ${this.gameTime.toFixed(2)}`);
+    }
 
     // start game immediately
     this.state = GAME_STATE.PLAYING;
+
+    return this;
   }
   sendMoveInput (move) {
     this.move = move;
 
-    if (move === ACTIONS.DOWN) this.score += 0.125;
+    if (move === ACTIONS.DOWN) this.score += 0.0;
   }
   pause = () => (this.paused = !this.paused);
 
   getState = () => this.state;
   getScore = () => this.score;
   getGameTime = () => this.gameTime;
-  getSpeed = () => this.speed;
+  getSpeed = () => GAME_UI.speed;
   getBoard = () => this.board;
 
   step() {
-    this.gameTime = (millis() - this.gameTimer) / 1000;
-    this.timeHTML.html(`Time: ${this.gameTime.toFixed(2)}`); // update time
-
+    
     if (this.state != GAME_STATE.PLAYING || this.paused) return false;
-    if (millis() - this.cycle < 1000 / this.speed) return false;
+    this.gameTime = (millis() - this.gameTimer) / 1000;
+
+    if (millis() - this.cycle < 1000 / GAME_UI.speed) return false;
 
     const rowsCleared = this.board.step(this.move);
     this.move = ACTIONS.NONE; // reset move for next step
@@ -57,12 +62,14 @@ class Game {
     }
 
     this.score += rowsCleared;
-    this.scoreHTML.html(`Score: ${this.score}`);
-
-    return true;
+    return this;
   }
 
   render() {
+    // Background
+    fill(0);
+    rect(this.x, this.y, GAME_UI.width, GAME_UI.height);
+
     switch (this.state) {
       case GAME_STATE.WELCOME:
         this._showWelcomeScreen();
@@ -79,23 +86,33 @@ class Game {
   _checkGameOver = () => this.board.checkGameOver();
 
   _showWelcomeScreen() {
-    background(0);
     fill(255);
     textAlign(CENTER, CENTER);
-    textSize(UI.width / 500 * 32);
-    text("TETRIS\nPress Space to Start", UI.width / 2, UI.height / 2);
+    textSize(GAME_UI.width / 500 * 32);
+    text("TETRIS\nPress Space to Start", this.x + GAME_UI.width / 2, this.y + GAME_UI.height / 2);
   }
 
   _showGameScreen() {
     this.board.render(false);
+
+    if (player === PLAYER.HUMAN) {
+      this.scoreHTML.html(`Score: ${this.score.toFixed(2)}`);
+      this.timeHTML.html(`Time: ${this.gameTime.toFixed(2)}`); // update time
+    } else {
+      strokeWeight(0.1);
+      stroke(255);
+      fill(255);
+      text(`Score: ${this.score}`, this.x + GAME_UI.width - 50, this. y + 10);
+    }
   }
 
   _showGameOverScreen() {
-    background(0);
     fill(255);
     textAlign(CENTER, CENTER);
-    textSize(UI.width / 500 * 32);
-    text("GAME OVER\nPress Space to Restart", UI.width / 2, UI.height / 2);
+    textSize(GAME_UI.width / 500 * 32);
+    text("GAME OVER\nPress Space to Restart", this.x + GAME_UI.width / 2, this.y + GAME_UI.height / 2);
+    text(`Score: ${this.score}`, this.x + GAME_UI.width / 2, this.y + GAME_UI.height / 2 + 75);
+    text(`Time: ${this.gameTime.toFixed(2)}`, this.x + GAME_UI.width / 2, this.y + GAME_UI.height / 2 + 100);
   }
 
   _createHTML() {

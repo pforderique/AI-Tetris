@@ -1,12 +1,20 @@
 class Board {
-  constructor() {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
     this.width = BOARD.boardWidth;
     this.height = BOARD.boardHeight;
+
+    print(`Board created at (${this.x}, ${this.y}).`);
   }
 
   getGrid = () => this.grid;
   getWidth = () => this.width;
   getHeight = () => this.height;
+
+  // Returns the x and y offsets of the board in # of blocks
+  getXOffset = () => Math.floor(this.x / BOARD.blockWidth);
+  getYOffset = () => Math.floor(this.y / BOARD.blockHeight);
 
   setup() {
     this.grid = [...Array(this.height).keys()].map((_) =>
@@ -53,9 +61,10 @@ class Board {
     } else {
       // Add the current piece to landed and update grid
       this.currentPiece.getBlocks().forEach((block) => {
-        const pos = block.getPos();
+        const worldPos = block.getPos();
+        const localPos = this.blockWorld2Local(worldPos);
 
-        if (this.grid[pos.y]) this.grid[pos.y][pos.x] = TYPES.BLOCKED;
+        if (this.grid[localPos.y]) this.grid[localPos.y][localPos.x] = TYPES.BLOCKED;
 
         this.landedBlocks.push(block);
       });
@@ -75,7 +84,14 @@ class Board {
   }
 
   checkGameOver() {
-    return this.landedBlocks.some((block) => block.getPos().y < 0);
+    return this.landedBlocks.some((block) => block.getPos().y < this.getYOffset());
+  }
+
+  blockWorld2Local(pos) {
+    return createVector(
+      pos.x - this.getXOffset(),
+      pos.y - this.getYOffset()
+    );
   }
 
   _handleMove(move) {

@@ -1,19 +1,26 @@
 new p5();
 
+// Size of one game instance
+const GAME_UI = {
+  width: 250,
+  height: 500,
+  rows: 2,
+  cols: 2,
+  speed: 100, // speed in blocks per second
+}
+
+// Size of entire program screen
 const UI = {
-  width: 125,
-  height: 250,
-  // width: 700,
-  // height: 1300,
-  // // with 20, 40 blocks also works
+  width: GAME_UI.width * GAME_UI.cols,
+  height: GAME_UI.height * GAME_UI.rows,
 }
 
 const [bw, bh] = [10, 20].map((x) => x * 1);
 const BOARD = {
   boardWidth: bw,
   boardHeight: bh,
-  blockWidth: UI.width / bw,
-  blockHeight: UI.height / bh,
+  blockWidth: GAME_UI.width / bw,
+  blockHeight: GAME_UI.height / bh,
 }
 
 const GAME_STATE = {

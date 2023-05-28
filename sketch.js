@@ -6,20 +6,21 @@ let sim;
 function setup() {
   createCanvas(UI.width, UI.height);
 
-  player = PLAYER.HUMAN;
-  game = new Game(10); // speed in blocks per second
-  sim = new Simulation(game);
+  player = PLAYER.AI;
 
-  if (player === PLAYER.AI) sim.start();
+  if (player === PLAYER.HUMAN) {
+    game = new Game(0, 0);
+  } else {
+    sim = new Simulation();
+    sim.start();
+  }
 }
 
 function draw() {
-  background(0);
+  background(200);
 
-  if (player === PLAYER.AI) sim.step();
-  else game.step();
-
-  game.render();
+  if (player === PLAYER.AI) sim.step().render();
+  else game.step().render();
 }
 
 // Game controls
