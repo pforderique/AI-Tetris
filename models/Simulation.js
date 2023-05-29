@@ -1,4 +1,4 @@
-const MAX_GAMES = 256;
+const MAX_RUNS = 10;
 
 class Simulation {
   constructor() {
@@ -28,6 +28,7 @@ class Simulation {
 
     // Stats for the overall simulation
     this.overallStats = {
+      simsRan: 0,
       gamesPlayed: 0,
       bestScore: 0,
       avgScore: 0,
@@ -53,7 +54,7 @@ class Simulation {
       this._updateStats();
       this._displayStats();
 
-      if (this.overallStats.gamesPlayed < MAX_GAMES) {
+      if (this.overallStats.simsRan < MAX_RUNS) {
         this.start();
       } else {
         this.runSimulation = false;
@@ -109,6 +110,7 @@ class Simulation {
     };
 
     this.overallStats = {
+      simsRan: this.overallStats.simsRan + 1,
       gamesPlayed: this.overallStats.gamesPlayed + sims.length,
       bestScore: max(
         this.overallStats.bestScore,
@@ -133,15 +135,14 @@ class Simulation {
 
   _displayStats() {
     this.genStatsHTML.html(`Best Score: ${this.generationStats.bestScore} | 
-    Average Score: ${this.generationStats.avgScore.toFixed(2)} | 
-    Simulation Time: ${this.generationStats.simTime.toFixed(2)}`);
+      Average Score: ${this.generationStats.avgScore.toFixed(2)} | 
+      Simulation Time: ${this.generationStats.simTime.toFixed(2)}`);
 
-    this.overallStatsHTML.html(
-      `Games Played: ${this.overallStats.gamesPlayed} |
-    Best Score: ${this.overallStats.bestScore} |
-    Average Score: ${this.overallStats.avgScore.toFixed(2)} |
-    Average Lifetime: ${this.overallStats.avgLifetime.toFixed(2)}`
-    );
+    this.overallStatsHTML.html(`Sims Ran: ${this.overallStats.simsRan} |
+      Games Played: ${this.overallStats.gamesPlayed} |
+      Best Score: ${this.overallStats.bestScore} |
+      Average Score: ${this.overallStats.avgScore.toFixed(2)} |
+      Average Lifetime: ${this.overallStats.avgLifetime.toFixed(2)}`);
   }
 
   _createStatsHTML() {
