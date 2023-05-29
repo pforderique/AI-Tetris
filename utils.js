@@ -2,10 +2,10 @@ new p5();
 
 // Size of one game instance
 const GAME_UI = {
-  width: 250,
-  height: 500,
-  rows: 2,
-  cols: 2,
+  width: 200,
+  height: 400,
+  rows: 5,
+  cols: 16,
   speed: 100, // speed in blocks per second
 }
 
@@ -56,7 +56,7 @@ const ACTIONS = {
   NONE: "none",
   LEFT: "left",
   RIGHT: "right",
-  // DOWN: "down",
+  DOWN: "down",
   ROTATE: "rotate",
 };
 

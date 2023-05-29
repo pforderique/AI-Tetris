@@ -19,7 +19,14 @@ function setup() {
 function draw() {
   background(200);
 
-  if (player === PLAYER.AI) sim.step().render();
+  if (player === PLAYER.AI) {
+    const speedUp = 1;
+    for (let i = 0; i < speedUp; i++) {
+      sim.step()
+    }
+
+    sim.render();
+  }
   else game.step().render();
 }
 

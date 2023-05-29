@@ -1,30 +1,11 @@
 class AI {
   constructor(game) {
     this.game = game;
-    this.stats = {
-      gamesPlayed: 0,
-      bestScore: 0,
-      avgScore: 0,
-      avgTime: 0,
-    };
   }
 
   generateMove(board) {
     throw new Error("generateMove() not implemented");
   }
-
-  updateStats(score, time) {
-    this.stats.gamesPlayed++;
-    this.stats.avgScore =
-      (this.stats.avgScore * (this.stats.gamesPlayed - 1) + score) /
-      this.stats.gamesPlayed;
-    this.stats.avgTime =
-      (this.stats.avgTime * (this.stats.gamesPlayed - 1) + time) /
-      this.stats.gamesPlayed;
-    this.stats.bestScore = max(this.stats.bestScore, score);
-  }
-
-  getStats = () => this.stats;
 }
 
 class RandomBot extends AI {

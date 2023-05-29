@@ -1,70 +1,75 @@
-const MAX_GAMES = 100;
+const MAX_GAMES = 256;
 
 class Simulation {
   constructor() {
     const popCount = GAME_UI.cols * GAME_UI.rows;
+    this.runSimulation = false;
+
     this.sims = [];
-    
     for (let row = 0; row < GAME_UI.rows; row++) {
       for (let col = 0; col < GAME_UI.cols; col++) {
         const idx = row * GAME_UI.cols + col;
         const x = col * GAME_UI.width;
         const y = row * GAME_UI.height;
 
-        print(`Game ${idx} created at (${x}, ${y}).`);
         const game = new Game(x, y, GAME_UI.speed);
         const bot = new RandomBot(game);
 
-        this.sims.push({ game, bot, runSimulation: false });
+        this.sims.push({ game, bot });
       }
     }
+
+    // Stats for the current generation
+    this.generationStats = {
+      bestScore: 0,
+      avgScore: 0,
+      simTime: 0,
+    };
+
+    // Stats for the overall simulation
+    this.overallStats = {
+      gamesPlayed: 0,
+      bestScore: 0,
+      avgScore: 0,
+      avgLifetime: 0,
+    };
 
     this._createStatsHTML();
   }
 
   start() {
-    this.sims.forEach((sim) => {
-      sim.game.start();
-      sim.runSimulation = true;
-    });
-    // this.sims.map((sim) => sim.runSimulation = true);
-    // this.gamesPlayed = 0;
+    this.sims.forEach((sim) => sim.game.start());
+    this.runSimulation = true;
   }
 
-  pause() {
-    this.sims.map((sim) => sim.game.pause());
-  }
+  pause = () => this.sims.map((sim) => sim.game.pause());
 
   step() {
-    // Automatically start game if on welcome screen
-    for (const sim of this.sims){
-      if (sim.runSimulation && sim.game.getState() === GAME_STATE.WELCOME)
-        sim.game.start();
+    // Stop simulation if requested
+    if (!this.runSimulation) return this;
+
+    // Only once every game is over, display stats and start again
+    if (this.sims.every((sim) => sim.game.getState() === GAME_STATE.GAMEOVER)) {
+      this._updateStats();
+      this._displayStats();
+
+      if (this.overallStats.gamesPlayed < MAX_GAMES) {
+        this.start();
+      } else {
+        this.runSimulation = false;
+        print(
+          `Random Bot Stats:\n\tGames Played: ${
+            this.overallStats.gamesPlayed
+          }\n\tBest Score: ${
+            this.overallStats.bestScore
+          }\n\tAvg Score: ${this.overallStats.avgScore.toFixed(
+            2
+          )}\n\tAvg Time Alive: ${this.overallStats.avgLifetime.toFixed(
+            2
+          )}\n\t(speed: ${this.sims[0].game.getSpeed()})`
+        );
+      }
     }
-
-    // if (this.game.getState() === GAME_STATE.GAMEOVER) {
-    //   // Update and display stats after game over
-    //   this.bot.updateStats(this.game.getScore(), this.game.getGameTime());
-    //   this._displayStats(this.bot.getStats());
-
-    //   // Start again if game over and still have games left
-    //   if (++this.gamesPlayed < MAX_GAMES) {
-    //     this.game.start();
-    //   } else {
-    //     this.runSimulation = false;
-    //     print(
-    //       `Random Bot Stats:\n\tGames Played: ${
-    //         this.bot.getStats().gamesPlayed
-    //       }\n\tBest Score: ${
-    //         this.bot.getStats().bestScore
-    //       }\n\tAvg Score: ${this.bot
-    //         .getStats()
-    //         .avgScore.toFixed(2)}\n\tAvg Time Alive: ${this.bot
-    //         .getStats()
-    //         .avgTime.toFixed(2)}\n\t(speed: ${this.game.getSpeed()})`
-    //     );
-    //   }
-    // }
 
     // Generate move for AI after every successful step
     for (const sim of this.sims) {
@@ -74,7 +79,7 @@ class Simulation {
       }
     }
 
-    return this
+    return this;
   }
 
   render() {
@@ -87,26 +92,84 @@ class Simulation {
   getState() {
     if (this.sims.every((sim) => sim.game.getState() === GAME_STATE.GAMEOVER))
       return GAME_STATE.GAMEOVER;
-    else if (this.sims.every((sim) => sim.game.getState() === GAME_STATE.WELCOME))
+    else if (
+      this.sims.every((sim) => sim.game.getState() === GAME_STATE.WELCOME)
+    )
       return GAME_STATE.WELCOME;
     else return GAME_STATE.PLAYING;
   }
 
-  _displayStats(stats) {
-    this.gamesPlayedHtml.html(`Games Played: ${stats.gamesPlayed}`);
-    this.bestScoreHtml.html(`Best Score: ${stats.bestScore}`);
-    this.avgScoreHtml.html(`Avg Score: ${stats.avgScore.toFixed(2)}`);
-    this.avgTimeHtml.html(`Avg Time Alive: ${stats.avgTime.toFixed(2)}`);
+  _updateStats() {
+    const sims = this.sims;
+    this.generationStats = {
+      bestScore: sims.reduce((pt, sim) => max(pt, sim.game.getScore()), 0),
+      avgScore:
+        sims.reduce((pt, sim) => pt + sim.game.getScore(), 0) / sims.length,
+      simTime: sims.reduce((pt, sim) => max(pt, sim.game.getGameTime()), 0),
+    };
+
+    this.overallStats = {
+      gamesPlayed: this.overallStats.gamesPlayed + sims.length,
+      bestScore: max(
+        this.overallStats.bestScore,
+        this.generationStats.bestScore
+      ),
+      avgScore:
+        this.overallStats.avgScore === 0
+          ? this.generationStats.avgScore
+          : (this.overallStats.avgScore *
+              (this.overallStats.gamesPlayed - sims.length) +
+              this.generationStats.avgScore * sims.length) /
+            this.overallStats.gamesPlayed,
+      avgLifetime:
+        this.overallStats.avgLifetime === 0
+          ? this.generationStats.simTime
+          : (this.overallStats.avgLifetime *
+              (this.overallStats.gamesPlayed - sims.length) +
+              this.generationStats.simTime * sims.length) /
+            this.overallStats.gamesPlayed,
+    };
+  }
+
+  _displayStats() {
+    this.genStatsHTML.html(`Best Score: ${this.generationStats.bestScore} | 
+    Average Score: ${this.generationStats.avgScore.toFixed(2)} | 
+    Simulation Time: ${this.generationStats.simTime.toFixed(2)}`);
+
+    this.overallStatsHTML.html(
+      `Games Played: ${this.overallStats.gamesPlayed} |
+    Best Score: ${this.overallStats.bestScore} |
+    Average Score: ${this.overallStats.avgScore.toFixed(2)} |
+    Average Lifetime: ${this.overallStats.avgLifetime.toFixed(2)}`
+    );
   }
 
   _createStatsHTML() {
-    const statsHTML = createSpan("")
+    const genHTML = createSpan("Generation Stats")
       .style("width", `${UI.width}px`)
-      .style("font-size", "1.6rem");
+      .style("font-size", "1.6rem")
+      .style("display", "flex");
 
-    this.gamesPlayedHtml = createP("Games Played: 0").parent(statsHTML);
-    this.bestScoreHtml = createP("Best Score: 0").parent(statsHTML);
-    this.avgScoreHtml = createP("Avg Score: 0.00").parent(statsHTML);
-    this.avgTimeHtml = createP("Avg Time Alive: 0.00").parent(statsHTML);
+    const overallHTML = createSpan("Overall Stats")
+      .style("width", `${UI.width}px`)
+      .style("font-size", "1.6rem")
+      .style("display", "flex");
+
+    this.genStatsHTML = createP(`Best Score: ${
+      this.generationStats.bestScore
+    } | 
+    Average Score: ${this.generationStats.avgScore.toFixed(2)} | 
+    Simulation Time: ${this.generationStats.simTime.toFixed(2)}`).parent(
+      genHTML
+    );
+
+    this.overallStatsHTML = createP(`Games Played: ${
+      this.overallStats.gamesPlayed
+    } |
+    Best Score: ${this.overallStats.bestScore} |
+    Average Score: ${this.overallStats.avgScore.toFixed(2)} |
+    Average Lifetime: ${this.overallStats.avgLifetime.toFixed(2)}`).parent(
+      overallHTML
+    );
   }
 }
