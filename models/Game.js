@@ -67,8 +67,12 @@ class Game {
 
   render() {
     // Background
+    push();
     fill(0);
+    stroke(225);
+    strokeWeight(3);
     rect(this.x, this.y, GAME_UI.width, GAME_UI.height);
+    pop();
 
     switch (this.state) {
       case GAME_STATE.WELCOME:

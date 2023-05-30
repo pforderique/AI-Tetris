@@ -3,11 +3,13 @@ let player;
 let game;
 let sim;
 
+let slider;
+
 function setup() {
   createCanvas(UI.width, UI.height);
-
+  slider = createSlider(1, 100, 1);
+  
   player = PLAYER.AI;
-
   if (player === PLAYER.HUMAN) {
     game = new Game(0, 0);
   } else {
@@ -20,8 +22,7 @@ function draw() {
   background(200);
 
   if (player === PLAYER.AI) {
-    const speedUp = 1;
-    for (let i = 0; i < speedUp; i++) {
+    for (let i = 0; i < slider.value(); i++) {
       sim.step()
     }
 

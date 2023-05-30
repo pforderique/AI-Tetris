@@ -77,3 +77,22 @@ function randChoose(choices) {
   var index = Math.floor(Math.random() * choices.length);
   return choices[index];
 }
+
+function getPieceType(piece) {
+  switch (piece.constructor.name) {
+    case "Square":
+      return 0;
+    case "Line":
+      return 1;
+    case "T":
+      return 2;
+    case "LeftL":
+      return 3;
+    case "RightL":
+      return 4;
+    case "LeftZ":
+      return 5;
+    case "RightZ":
+      return 6;
+  }
+}

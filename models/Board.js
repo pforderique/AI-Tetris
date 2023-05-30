@@ -92,6 +92,37 @@ class Board {
     );
   }
 
+  getBoardInput() {
+    const peaks = this._get_peaks();
+    const maxPeak = Math.max(...peaks);
+
+    const holes = this._get_holes(peaks);
+    const holeCount = holes.reduce((acc, hole) => acc + hole, 0);
+
+    const wells = this._get_wells(peaks);
+    const maxWell = Math.max(...wells);
+
+    const pits = peaks.map((peak) => peak == 0 ? 1 : 0);
+    const numPits = pits.reduce((acc, pit) => acc + pit, 0);
+    const bumpiness = this._get_bumpiness(peaks);
+
+    const pieceNumber = getPieceType(this.currentPiece);
+    const pieceLoc = this.currentPiece.getPos().x;
+
+    return [
+      pieceNumber / 7,
+      pieceLoc / this.width,
+      maxPeak / this.height,
+      maxWell / this.height,
+      holeCount / this.height * this.width,
+      bumpiness / this.height,
+      numPits / this.width,
+      ...pits,
+      ...peaks.map((peak) => peak / this.height),
+      ...wells.map((well) => well / this.height),
+    ];
+  }
+
   _handleMove(move) {
     switch (move) {
       case ACTIONS.ROTATE:
@@ -146,5 +177,56 @@ class Board {
         .filter((piece) => piece.getPos().y < row)
         .forEach((piece) => piece.moveDownOne());
     }
+  }
+
+  _get_peaks() {
+    const peaks = [];
+    for (let col = 0; col < this.width; col++) {
+      let peak = 0;
+      for (let row = 0; row < this.height; row++) {
+        if (this.grid[row][col] === TYPES.BLOCKED) {
+          peak = row;
+          break;
+        }
+      }
+      peaks.push(peak);
+    }
+    return peaks;
+  }
+
+  _get_holes(peaks) {
+    const holes = [];
+    for (let col = 0; col < this.width; col++) {
+      let hole = 0;
+      for (let row = peaks[col]; row < this.height; row++) {
+        if (this.grid[row][col] === TYPES.EMPTY) hole++;
+      }
+      holes.push(hole);
+    }
+    return holes;
+  }
+
+  _get_bumpiness(peaks) {
+    let bumpiness = 0;
+    for (let col = 0; col < this.width - 1; col++) {
+      bumpiness += abs(peaks[col] - peaks[col + 1]);
+    }
+    return bumpiness;
+  }
+
+  _get_wells(peaks) {
+    const wells = [];
+    for (let col = 0; col < this.width; col++) {
+      let well = 0;
+      if (col === 0) {
+        well = max(peaks[col + 1] - peaks[col], 0);
+      } else if (col === this.width - 1) {
+        well = max(peaks[col - 1] - peaks[col], 0);
+      } else {
+        well = max(min(peaks[col - 1], peaks[col + 1]) - peaks[col], 0);
+      }
+      wells.push(well);
+    }
+    return wells;
   }
 }

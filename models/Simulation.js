@@ -1,4 +1,4 @@
-const MAX_RUNS = 10;
+const MAX_RUNS = 5;
 
 class Simulation {
   constructor() {
@@ -8,12 +8,11 @@ class Simulation {
     this.sims = [];
     for (let row = 0; row < GAME_UI.rows; row++) {
       for (let col = 0; col < GAME_UI.cols; col++) {
-        const idx = row * GAME_UI.cols + col;
         const x = col * GAME_UI.width;
         const y = row * GAME_UI.height;
 
         const game = new Game(x, y, GAME_UI.speed);
-        const bot = new RandomBot(game);
+        const bot = new GeneticBot(game);
 
         this.sims.push({ game, bot });
       }
@@ -55,6 +54,31 @@ class Simulation {
       this._displayStats();
 
       if (this.overallStats.simsRan < MAX_RUNS) {
+        // Calculate how good each bot was and update fitness
+        this.sims.forEach((sim) => {
+          const { game, bot } = sim;
+          const score = game.getScore();
+
+          const [_, __, maxPeak, maxWell, holeCount, bumpiness, numPits] = game
+            .getBoard()
+            .getBoardInput();
+            
+          const fitness =
+            score +
+            -0.1 * maxPeak +
+            -0.1 * holeCount +
+            -0.5 * maxWell +
+            -0.5 * bumpiness +
+            -0.5 * numPits;
+          bot.fitness = fitness;
+        });
+
+        // Evolve the bots
+        const newBots = GeneticBot.evolve(this.sims.map((sim) => sim.bot));
+        this.sims.forEach((sim, idx) => {
+          sim.bot = newBots[idx];
+        });
+
         this.start();
       } else {
         this.runSimulation = false;
@@ -75,6 +99,7 @@ class Simulation {
     // Generate move for AI after every successful step
     for (const sim of this.sims) {
       if (sim.game.step()) {
+        // Make the next move
         const aiMove = sim.bot.generateMove(sim.game.getBoard());
         sim.game.sendMoveInput(aiMove);
       }
